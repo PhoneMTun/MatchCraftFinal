@@ -5,6 +5,7 @@ import DashboardPage from '../Pages/DashboardPage';
 import Navbar from '../navbar/navbar'; // Ensure this path is correct
 import FriendsPopup from '../../Popup/FriendsPopup'; // Ensure this path is correct
 import ViewProfile from '../../Popup/ViewProfile';
+import PreferencesPage from '../Pages/PreferencesPage';
 
 export default function Container() {
     // State and handler are now correctly defined inside the component
@@ -23,6 +24,7 @@ export default function Container() {
             <Routes>
                 <Route path='/dashboard' element={<DashboardPage />} />
                 <Route path='/profile/:userId' element={<ViewProfile />} />
+                <Route path='/preferences/:userId' element={<PreferencesPage />} />
             </Routes>
         </>
     );

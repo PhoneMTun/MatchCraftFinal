@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Modal, Box, Typography, Button, TextField, Slide, useTheme, Table, TableBody, TableCell, TableRow, TableContainer, Paper } from '@mui/material';
+import { Modal, Box, Typography, Button, TextField, Slide, Table, TableBody, TableCell, TableRow, TableContainer, Paper, List, ListItem, ListItemText, Chip } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import UserContext from '../context/UserContext';
@@ -8,37 +8,52 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
+const modalStyle = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 'auto',
+  maxWidth: '600px', // Adjusted for better responsiveness
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+  overflow: 'auto', // Added to handle overflow
+  maxHeight: '90%', // Ensures modal does not exceed viewport height
+};
+
 const FriendsPopup = ({ isVisible, onClose }) => {
-  const theme = useTheme();
+  const navigate = useNavigate();
+  const { user } = useContext(UserContext);
   const [view, setView] = useState('list');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState(null);
-  const navigate = useNavigate();
-  const { user } = useContext(UserContext);
   const [pendingFriends, setPendingFriends] = useState([]);
   const [friends, setFriends] = useState([]);
-  console.log(searchResults)
-
+  console.log(user.id)
   useEffect(() => {
     if (!user?.id) return;
 
-    const fetchPendingFriends = async () => {
+    const fetchFriendsData = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:8080/api/friends/pending/${user.id}`, { withCredentials: true });
-        setPendingFriends(data || []);
+        const pendingResponse = await axios.get(`http://localhost:8080/api/friends/pending/${user.id}`, { withCredentials: true });
+        
+        setPendingFriends(pendingResponse.data || []);
+        fetchFriends()
       } catch (error) {
-        console.error("Failed to fetch pending friend requests:", error);
+        console.error("Failed to fetch friends data:", error);
       }
     };
 
-    fetchPendingFriends();
-    fetchFriends();
+    fetchFriendsData();
   }, [user]);
 
   const fetchFriends = async () => {
     try {
       // This is a placeholder URL and should be replaced with your actual API endpoint
       const { data } = await axios.get(`http://localhost:8080/api/friends/${user.id}`, { withCredentials: true });
+      console.log(data);
       setFriends(data || []);
     } catch (error) {
       console.error("Failed to fetch friends list:", error);
@@ -57,23 +72,25 @@ const FriendsPopup = ({ isVisible, onClose }) => {
     }
   };
 
-  const acceptFriendRequest = async (requestId) => {
+  const acceptFriendRequest = async (friendRequestId) => {
     try {
-      await axios.post(`http://localhost:8080/api/friends/accept/${requestId}`, {}, { withCredentials: true });
-      setPendingFriends(pendingFriends.filter(friend => friend.id !== requestId));
+      console.log(friendRequestId)
+      await axios.post(`http://localhost:8080/api/friends/accept/${friendRequestId}`, {}, { withCredentials: true });
+      setPendingFriends(pendingFriends.filter(friendRequest => friendRequest.requestId !== friendRequestId));
     } catch (error) {
       console.error("Failed to accept friend request:", error);
     }
   };
-
-  const rejectFriendRequest = async (requestId) => {
+  
+  const rejectFriendRequest = async (friendRequestId) => {
     try {
-      await axios.post(`http://localhost:8080/api/friends/reject/${requestId}`, {}, { withCredentials: true });
-      setPendingFriends(pendingFriends.filter(friend => friend.id !== requestId));
+      await axios.post(`http://localhost:8080/api/friends/reject/${friendRequestId}`, {}, { withCredentials: true });
+      setPendingFriends(pendingFriends.filter(friendRequest => friendRequest.requestId !== friendRequestId));
     } catch (error) {
       console.error("Failed to reject friend request:", error);
     }
   };
+  
 
   const modalStyle = {
     position: 'absolute',
@@ -89,36 +106,45 @@ const FriendsPopup = ({ isVisible, onClose }) => {
   };
 
   return (
-    <Modal
-      open={isVisible}
-      onClose={onClose}
-      aria-labelledby="modal-title"
-      aria-describedby="modal-description"
-      TransitionComponent={Transition}
-    >
+    <Modal open={isVisible} onClose={onClose} aria-labelledby="modal-title" aria-describedby="modal-description" TransitionComponent={Transition}>
       <Box sx={modalStyle}>
         <Typography id="modal-title" variant="h6" component="div" sx={{ mb: 2, textAlign: 'center' }}>
           {view === 'list' ? 'Friends List' : view === 'add' ? 'Add New Friend' : 'Pending Friend Requests'}
         </Typography>
-        
-        {/* Buttons to switch views */}
         <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center', gap: 2 }}>
           <Button variant="outlined" onClick={() => setView('list')}>View Friends</Button>
           <Button variant="outlined" onClick={() => setView('add')}>Add Friend</Button>
           <Button variant="outlined" onClick={() => setView('pending')}>Pending Requests</Button>
         </Box>
         {view === 'list' && friends.length > 0 && (
-          <>
-            <Typography id="modal-modal-title" variant="h6" component="h2">
-              Online Friends
-            </Typography>
-            {friends.map(friend => (
-              <Typography key={friend.id} sx={{ mt: 1 }}>
-                {friend.name}
-              </Typography>
-            ))}
-          </>
-        )}
+  <>
+    <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
+      Online Friends
+    </Typography>
+    <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+      {friends.map(friend => (
+        <ListItem 
+          key={friend.id} 
+          sx={{ 
+            mt: 1, 
+            bgcolor: 'background.paper', 
+            boxShadow: 1, // Adds a slight shadow for depth
+            borderRadius: '4px', // Rounds the corners for a softer look
+          }}
+          secondaryAction={
+            <Chip 
+              label={friend.isOnline ? 'Online' : 'Offline'} 
+              color={friend.isOnline ? 'success' : 'default'} 
+              variant="outlined" 
+            />
+          }
+        >
+          <ListItemText primary={friend.name} />
+        </ListItem>
+      ))}
+    </List>
+  </>
+)}
         {view === 'add' && (
           <>
             <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ mb: 2 }}>
@@ -161,11 +187,11 @@ const FriendsPopup = ({ isVisible, onClose }) => {
                 pendingFriends.map((friend) => (
                   <Box key={friend.id} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
                     <Typography>
-                      {friend.name}
+                      {friend.userName}
                     </Typography>
                     <Box>
-                      <Button onClick={() => acceptFriendRequest(friend.id)} color="primary">Accept</Button>
-                      <Button onClick={() => rejectFriendRequest(friend.id)} color="secondary">Reject</Button>
+                      <Button onClick={() => acceptFriendRequest(friend.friendshipId)} color="primary">Accept</Button>
+                      <Button onClick={() => rejectFriendRequest(friend.friendshipId)} color="secondary">Reject</Button>
                     </Box>
                   </Box>
                 ))

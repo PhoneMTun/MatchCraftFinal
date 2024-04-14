@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import UserContext from '../context/UserContext';
+import ViewPlayingStyle from '../components/Compo/ViewPlayingStyle';
+import RecentMatches from '../components/Compo/RecentMatches';
 import {
     Card,
     CardContent,
@@ -63,6 +65,7 @@ const ViewProfile = () => {
     const { user } = useContext(UserContext);
     const effectiveUserId = userId ? userId : user.id;
     const [thisUserName, setThisUserName] = useState('');
+    const [steamId, setSteamId] = useState('');
     const [thisUserSkills, setThisUserSkills] = useState({
         id: 'loading...',
         total_wins: 'loading...', 
@@ -100,6 +103,7 @@ const ViewProfile = () => {
                         const userResponse = await axios.get(`http://localhost:8080/api/user/${userId}`, { withCredentials: true });
                         console.log(userResponse.data); // Assuming userResponse.data is not an array, directly log or use the response
                         setThisUserName(userResponse.data.username); // Adjust according to actual response structure
+                        setSteamId(userResponse.data.steamId); 
                     }
                 } catch (error) {
                     console.error("There was an error fetching the user data:", error);
@@ -170,6 +174,8 @@ const ViewProfile = () => {
                             </TableContainer>
                 </CardContent>
             </Card>
+            <ViewPlayingStyle userId={effectiveUserId} />
+            <RecentMatches steamId={steamId} />
         </ThemeProvider>
     );
 };

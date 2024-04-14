@@ -1,12 +1,20 @@
-/* Trigger for viewing profile */
+:root {
+  --bg-color: #303030; /* Dark grey for backgrounds */
+  --primary-color: #6200ea; /* A shade of purple for primary actions */
+  --hover-color: #3700b3; /* A darker shade of purple for hover states */
+  --text-color: #ffffff; /* White text for contrast */
+  --border-radius: 20px; /* Rounded edges */
+  --transition-speed: 0.3s; /* Standardize transition speed */
+}
+
 .view-profile-trigger {
   position: fixed;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: grey; /* Or any color you prefer */
-  opacity: 30%;
-  color: white;
+  background-color: var(--primary-color);
+  opacity: 0.9; /* Slightly less transparent for better visibility */
+  color: var(--text-color);
   border: none;
   cursor: pointer;
   z-index: 10;
@@ -15,36 +23,106 @@
   justify-content: center;
   gap: 5px;
   font-size: 16px;
-  border-radius: 20px; /* Rounded edges */
+  border-radius: var(--border-radius);
   padding: 10px 25px;
+  transition: background-color var(--transition-speed);
 }
 
-/* Arrow icon for the trigger */
-.view-profile-trigger::before {
-  content: "^";
-  display: block;
+.view-profile-trigger:hover {
+  background-color: var(--hover-color);
+  opacity: 1; /* Fully opaque on hover for focus */
 }
 
-/* Profile container that slides up */
 .profile-container {
   position: fixed;
   left: 0;
   right: 0;
-  top: 50%; /* Center vertically */
-  transform: translateY(100%); /* Start offscreen */
+  top: 50%;
+  transform: translateY(100%);
   margin: auto;
-  width: 90%; /* Adjust the width */
-  max-width: 400px; /* Maximum width */
-  background-color: rgba(0, 0, 0, 0.75); /* Semi-transparent black */
-  color: white;
-  border-radius: 25px; /* Rounded edges */
+  width: 90%;
+  max-width: 400px;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border-radius: var(--border-radius);
   transition: transform 0.5s ease-in-out;
   padding: 20px;
   box-sizing: border-box;
   z-index: 9;
 }
 
-/* State when the profile is shown */
 .profile-container.show {
-  transform: translateY(-50%); /* Adjust to slide up and center */
+  transform: translateY(-50%);
+}
+.hero-image-container {
+  padding: 10px;
+  text-align: center;
+  transition: transform var(--transition-speed), border-color var(--transition-speed);
+  border: 2px solid transparent;
+  position: relative}
+  selected-hero {
+    position: relative; /* Ensure that the checkmark is positioned relative to this container */
+    border: 2px solid #4CAF50; /* Slightly thinner border */
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.5); /* Optional: Adds a subtle shadow for depth */
+  }
+  
+  .selected-hero .hero-image {
+    transform: scale(1.02); /* Just a bit larger than the original size */
+    transition: transform 0.3s ease; /* Smooth transition for the scaling effect */
+  }
+  
+  .selected-hero .checkmark {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #4CAF50; /* Green background for the checkmark */
+    color: white; /* White text color for the checkmark */
+    padding: 5px;
+    border-radius: 50%; /* Circular shape */
+    font-size: 20px; /* Appropriate size for the checkmark */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px; /* Fixed width */
+    height: 25px; /* Fixed height */
+    margin: 4px; /* Slight margin from the edges */
+  }
+
+  /* display: flex;
+  justify-content: center; /* Center horizontally */
+  /* align-items: center; /* Center vertically */
+  /* height: 100%; */ */
+
+
+.hero-image-container:hover {
+  transform: scale(1.05);
+  border-color: var(--primary-color);
+}
+
+.hero-image {
+  width: 20rem;
+  height: auto;
+  cursor: pointer;
+  border-radius: var(--border-radius);
+  
+}
+/* For the slick slider dots */
+.slick-dots li button:before {
+  color: var(--text-color);
+}
+
+.slick-dots li.slick-active button:before {
+  color: var(--primary-color);
+}
+
+@media (max-width: 600px) {
+  .view-profile-trigger, .profile-container {
+    padding: 5px 15px;
+    font-size: 14px;
+    border-radius: var(--border-radius);
+  }
+
+  .hero-image {
+    width: 60%; /* Slightly larger on smaller screens for better visibility */
+  }
 }

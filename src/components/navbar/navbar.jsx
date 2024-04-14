@@ -24,45 +24,13 @@ export default function Navbar({ onFriendsClick }) {
           />
         </Toolbar>
         <Toolbar disableGutters style={{ justifyContent: 'center' }}>
-        <Button
-            color="inherit"
-            onClick={onFriendsClick} // Ensure this is correctly handled
-            sx={{
-              color: '#FFFFFF',
-              '&:hover': {
-                backgroundColor: 'rgba(255,255,255,0.2)',
-              },
-              transition: 'all 0.3s ease-in-out',
-            }}
-          >
+        <Button color="inherit" onClick={onFriendsClick} sx={{color: '#FFFFFF','&:hover': {backgroundColor: 'rgba(255,255,255,0.2)',},transition: 'all 0.3s ease-in-out',}}>
             Friends
-          </Button>
-          <Button
-            color="inherit"
-            onClick={() => navigate(`/matchcraft/profile/${user.id}`)}
-            sx={{
-              color: '#FFFFFF',
-              '&:hover': {
-                backgroundColor: 'rgba(255,255,255,0.2)',
-                // For additional effects, adjust here
-              },
-              transition: 'all 0.3s ease-in-out',
-            }}
-          >
+        </Button>
+        <Button color="inherit" onClick={() => navigate(`/matchcraft/profile/${user.id}`)}sx={{color: '#FFFFFF','&:hover': {backgroundColor: 'rgba(255,255,255,0.2)',},transition: 'all 0.3s ease-in-out',}}>
             Profile
           </Button>
-          <Button
-            color="inherit"
-            href="#preferences"
-            sx={{
-              color: '#FFFFFF',
-              '&:hover': {
-                backgroundColor: 'rgba(255,255,255,0.2)',
-                // Customize as needed
-              },
-              transition: 'all 0.3s ease-in-out',
-            }}
-          >
+          <Button  color="inherit"  onClick={() => navigate(`/matchcraft/preferences/${user.id}`)} sx={{ color: '#FFFFFF','&:hover': {backgroundColor: 'rgba(255,255,255,0.2)',},transition: 'all 0.3s ease-in-out',}}>
             Preferences
           </Button>
         </Toolbar>
